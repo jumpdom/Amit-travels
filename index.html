@@ -88,7 +88,7 @@
 
                 <!-- 3-4 Preferred Dates Option -->
                 <div>
-                    <label class="text-[11px] font-semibold text-slate-500">Select Preferred Dates (Select up to 4 dates)</label>
+                    <label class="text-[11px] font-semibold text-slate-500">Select Preferred Dates (Up to 4 dates)</label>
                     <div class="grid grid-cols-2 gap-2 mt-1">
                         <input type="date" id="date1" required class="text-xs p-2 border rounded-lg bg-slate-50 text-slate-700">
                         <input type="date" id="date2" class="text-xs p-2 border rounded-lg bg-slate-50 text-slate-700">
@@ -112,11 +112,11 @@
         <div>
             <h3 class="text-sm font-bold text-slate-800 mb-2">Tour Packages & Treks</h3>
             <div class="flex gap-2 overflow-x-auto pb-2 scrollbar-none text-xs">
-                <button onclick="filterCategory('all')" class="cat-btn bg-blue-600 text-white px-3.5 py-1.5 rounded-full font-semibold whitespace-nowrap shadow-sm">All</button>
-                <button onclick="filterCategory('Bangalore')" class="cat-btn bg-white text-slate-600 border border-slate-200 px-3.5 py-1.5 rounded-full font-semibold whitespace-nowrap">1 Day Banglore</button>
-                <button onclick="filterCategory('Honeymoon')" class="cat-btn bg-white text-slate-600 border border-slate-200 px-3.5 py-1.5 rounded-full font-semibold whitespace-nowrap">Honeymoon Package</button>
-                <button onclick="filterCategory('International')" class="cat-btn bg-white text-slate-600 border border-slate-200 px-3.5 py-1.5 rounded-full font-semibold whitespace-nowrap">International Trips</button>
-                <button onclick="filterCategory('Trek')" class="cat-btn bg-white text-slate-600 border border-slate-200 px-3.5 py-1.5 rounded-full font-semibold whitespace-nowrap">State Treks</button>
+                <button onclick="filterCategory('all', event)" class="cat-btn bg-blue-600 text-white px-3.5 py-1.5 rounded-full font-semibold whitespace-nowrap shadow-sm">All</button>
+                <button onclick="filterCategory('Bangalore', event)" class="cat-btn bg-white text-slate-600 border border-slate-200 px-3.5 py-1.5 rounded-full font-semibold whitespace-nowrap">1 Day Banglore</button>
+                <button onclick="filterCategory('Honeymoon', event)" class="cat-btn bg-white text-slate-600 border border-slate-200 px-3.5 py-1.5 rounded-full font-semibold whitespace-nowrap">Honeymoon Package</button>
+                <button onclick="filterCategory('International', event)" class="cat-btn bg-white text-slate-600 border border-slate-200 px-3.5 py-1.5 rounded-full font-semibold whitespace-nowrap">International Trips</button>
+                <button onclick="filterCategory('Trek', event)" class="cat-btn bg-white text-slate-600 border border-slate-200 px-3.5 py-1.5 rounded-full font-semibold whitespace-nowrap">State Treks</button>
             </div>
         </div>
 
@@ -145,17 +145,27 @@
         </div>
     </div>
 
-    <!-- Admin Panel Modal -->
+    <!-- Admin Dashboard Modal -->
     <div id="adminPanelModal" class="hidden fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
-        <div class="bg-white rounded-2xl p-5 w-full max-w-md space-y-4 shadow-2xl my-8">
+        <div class="bg-white rounded-2xl p-5 w-full max-w-lg space-y-4 shadow-2xl my-6">
             <div class="flex justify-between items-center border-b pb-3">
                 <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
-                    <i class="fa-solid fa-sliders text-blue-600"></i> Add New Package
+                    <i class="fa-solid fa-sliders text-blue-600"></i> Admin Management Panel
                 </h3>
                 <button onclick="closeAdminPanel()" class="text-slate-400 text-xl font-bold">&times;</button>
             </div>
+
+            <!-- Action Tabs -->
+            <div class="flex border-b text-xs font-bold gap-4">
+                <button id="adminTabFormBtn" onclick="switchAdminTab('form')" class="pb-2 border-b-2 border-blue-600 text-blue-600">Add/Edit Package</button>
+                <button id="adminTabManageBtn" onclick="switchAdminTab('manage')" class="pb-2 text-slate-500 border-b-2 border-transparent">Manage Packages (<span id="pkgCount">0</span>)</button>
+                <button id="adminTabBackupBtn" onclick="switchAdminTab('backup')" class="pb-2 text-slate-500 border-b-2 border-transparent">Backup/Restore</button>
+            </div>
             
-            <form onsubmit="addNewPackage(event)" class="space-y-3">
+            <!-- Tab 1: Form (Add or Edit) -->
+            <form id="packageForm" onsubmit="savePackage(event)" class="space-y-3">
+                <input type="hidden" id="editPkgId" value="">
+                
                 <div>
                     <label class="text-[11px] font-semibold text-slate-600">Package Title</label>
                     <input type="text" id="pkgTitle" required placeholder="e.g. Coorg Hill Station Trek" class="w-full text-xs p-2.5 border rounded-xl bg-slate-50">
@@ -177,7 +187,7 @@
                 </div>
                 <div>
                     <label class="text-[11px] font-semibold text-slate-600">Price (₹)</label>
-                    <input type="number" id="pkgPrice" required placeholder="2999" class="w-full text-xs p-2.5 border rounded-xl bg-slate-50">
+                    <input type="text" id="pkgPrice" required placeholder="2,999" class="w-full text-xs p-2.5 border rounded-xl bg-slate-50">
                 </div>
                 <div>
                     <label class="text-[11px] font-semibold text-slate-600">Photo Link (URL)</label>
@@ -187,10 +197,44 @@
                     <label class="text-[11px] font-semibold text-slate-600">Package Details</label>
                     <textarea id="pkgDetails" rows="3" required placeholder="Details about stay, food, inclusions..." class="w-full text-xs p-2.5 border rounded-xl bg-slate-50"></textarea>
                 </div>
-                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-3 rounded-xl shadow transition">
-                    + Add Tour Package
-                </button>
+                
+                <div class="flex gap-2">
+                    <button type="submit" id="submitBtn" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-3 rounded-xl shadow transition">
+                        + Add Tour Package
+                    </button>
+                    <button type="button" id="cancelEditBtn" onclick="resetForm()" class="hidden bg-slate-200 text-slate-700 text-xs font-bold px-4 rounded-xl">
+                        Cancel
+                    </button>
+                </div>
             </form>
+
+            <!-- Tab 2: Manage List (Edit & Delete Buttons) -->
+            <div id="adminManageSection" class="hidden space-y-2 max-h-80 overflow-y-auto pr-1">
+                <!-- Loaded via JS -->
+            </div>
+
+            <!-- Tab 3: Backup & Restore (Storage Safety) -->
+            <div id="adminBackupSection" class="hidden space-y-4 text-xs">
+                <div class="p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-800">
+                    <i class="fa-solid fa-shield-halved"></i> <strong>Storage Protection:</strong> Apne packages ka backup JSON file me download karein taaki data kabhi loss na ho.
+                </div>
+                
+                <div class="space-y-2">
+                    <h4 class="font-bold text-slate-700">1. Download Data Backup</h4>
+                    <button onclick="exportDataBackup()" class="w-full bg-emerald-600 text-white font-bold py-2.5 rounded-xl flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-download"></i> Download Backup File (.json)
+                    </button>
+                </div>
+
+                <div class="space-y-2 pt-2 border-t">
+                    <h4 class="font-bold text-slate-700">2. Restore Data from File</h4>
+                    <input type="file" id="importFile" accept=".json" class="w-full text-xs p-2 border rounded-xl bg-slate-50">
+                    <button onclick="importDataBackup()" class="w-full bg-indigo-600 text-white font-bold py-2.5 rounded-xl flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-upload"></i> Restore Backup
+                    </button>
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -199,9 +243,9 @@
         const WHATSAPP_NUM = "918521694137";
         const ADMIN_PASS = "Amit855102@";
 
-        let defaultPackages = [
+        const defaultPackages = [
             {
-                id: 1,
+                id: "1693800000001",
                 title: "1 Day Nandi Hills & Bangalore Sightseeing",
                 category: "Bangalore",
                 state: "Karnataka",
@@ -210,7 +254,7 @@
                 details: "Pickup & Drop, Nandi Hills sunrise, Botanical Garden & Temple visit included."
             },
             {
-                id: 2,
+                id: "1693800000002",
                 title: "Romantic Goa Beach Honeymoon Package",
                 category: "Honeymoon",
                 state: "Goa",
@@ -219,7 +263,7 @@
                 details: "4 Days 3 Nights stay, Resort, Candlelight Dinner, Beach Tours & Cruise."
             },
             {
-                id: 3,
+                id: "1693800000003",
                 title: "Exotic Bali Island Paradise Tour",
                 category: "International",
                 state: "Indonesia",
@@ -231,7 +275,15 @@
 
         function getPackages() {
             const stored = localStorage.getItem("amit_travels_pkgs");
-            return stored ? JSON.parse(stored) : defaultPackages;
+            if (!stored) {
+                localStorage.setItem("amit_travels_pkgs", JSON.stringify(defaultPackages));
+                return defaultPackages;
+            }
+            return JSON.parse(stored);
+        }
+
+        function savePackagesToStorage(pkgs) {
+            localStorage.setItem("amit_travels_pkgs", JSON.stringify(pkgs));
         }
 
         function renderPackages(filter = "all") {
@@ -274,6 +326,37 @@
             });
         }
 
+        function renderAdminManageList() {
+            const container = document.getElementById("adminManageSection");
+            const packages = getPackages();
+            document.getElementById("pkgCount").innerText = packages.length;
+
+            if (packages.length === 0) {
+                container.innerHTML = `<div class="text-center py-4 text-xs text-slate-400">No packages available. Add one now!</div>`;
+                return;
+            }
+
+            container.innerHTML = packages.map(pkg => `
+                <div class="p-3 border rounded-xl bg-slate-50 flex items-center justify-between gap-2">
+                    <div class="flex items-center gap-2 overflow-hidden">
+                        <img src="${pkg.image}" class="w-10 h-10 rounded-lg object-cover flex-shrink-0" onerror="this.src='https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=500&q=80'">
+                        <div class="truncate">
+                            <h5 class="text-xs font-bold text-slate-800 truncate">${pkg.title}</h5>
+                            <p class="text-[10px] text-slate-500">₹${pkg.price} | ${pkg.category}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-1 flex-shrink-0">
+                        <button onclick="editPackage('${pkg.id}')" class="bg-blue-100 text-blue-600 p-2 rounded-lg text-xs hover:bg-blue-200" title="Edit">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                        </button>
+                        <button onclick="deletePackage('${pkg.id}')" class="bg-red-100 text-red-600 p-2 rounded-lg text-xs hover:bg-red-200" title="Delete">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
         function switchTab(type) {
             document.getElementById('serviceType').value = type;
             document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -314,15 +397,15 @@
             window.open(`https://wa.me/${WHATSAPP_NUM}?text=${encodeURIComponent(text)}`, '_blank');
         }
 
-        function filterCategory(cat) {
+        function filterCategory(cat, evt) {
             document.querySelectorAll('.cat-btn').forEach(btn => {
                 btn.className = "cat-btn bg-white text-slate-600 border border-slate-200 px-3.5 py-1.5 rounded-full font-semibold whitespace-nowrap";
             });
-            event.target.className = "cat-btn bg-blue-600 text-white px-3.5 py-1.5 rounded-full font-semibold whitespace-nowrap shadow-sm";
+            evt.target.className = "cat-btn bg-blue-600 text-white px-3.5 py-1.5 rounded-full font-semibold whitespace-nowrap shadow-sm";
             renderPackages(cat);
         }
 
-        // Admin Security Functions
+        // Admin Modals
         function openAdminModal() {
             document.getElementById('adminAuthModal').classList.remove('hidden');
         }
@@ -335,16 +418,42 @@
                 closeAdminModal();
                 document.getElementById('adminPasswordInput').value = '';
                 document.getElementById('adminPanelModal').classList.remove('hidden');
+                renderAdminManageList();
             } else {
-                alert("Galat Password! Admin Password enter karein.");
+                alert("Galat Password! Password hai: Amit855102@");
             }
         }
         function closeAdminPanel() {
             document.getElementById('adminPanelModal').classList.add('hidden');
+            resetForm();
         }
 
-        function addNewPackage(e) {
+        function switchAdminTab(tab) {
+            document.getElementById('packageForm').classList.add('hidden');
+            document.getElementById('adminManageSection').classList.add('hidden');
+            document.getElementById('adminBackupSection').classList.add('hidden');
+
+            document.getElementById('adminTabFormBtn').className = "pb-2 text-slate-500 border-b-2 border-transparent";
+            document.getElementById('adminTabManageBtn').className = "pb-2 text-slate-500 border-b-2 border-transparent";
+            document.getElementById('adminTabBackupBtn').className = "pb-2 text-slate-500 border-b-2 border-transparent";
+
+            if (tab === 'form') {
+                document.getElementById('packageForm').classList.remove('hidden');
+                document.getElementById('adminTabFormBtn').className = "pb-2 border-b-2 border-blue-600 text-blue-600 font-bold";
+            } else if (tab === 'manage') {
+                document.getElementById('adminManageSection').classList.remove('hidden');
+                document.getElementById('adminTabManageBtn').className = "pb-2 border-b-2 border-blue-600 text-blue-600 font-bold";
+                renderAdminManageList();
+            } else if (tab === 'backup') {
+                document.getElementById('adminBackupSection').classList.remove('hidden');
+                document.getElementById('adminTabBackupBtn').className = "pb-2 border-b-2 border-blue-600 text-blue-600 font-bold";
+            }
+        }
+
+        // Add / Update Package Logic
+        function savePackage(e) {
             e.preventDefault();
+            const editId = document.getElementById('editPkgId').value;
             const title = document.getElementById('pkgTitle').value;
             const category = document.getElementById('pkgCategory').value;
             const state = document.getElementById('pkgState').value;
@@ -352,18 +461,95 @@
             const image = document.getElementById('pkgImage').value;
             const details = document.getElementById('pkgDetails').value;
 
-            const newPkg = {
-                id: Date.now(),
-                title, category, state, price, image, details
-            };
+            let pkgs = getPackages();
 
-            const pkgs = getPackages();
-            pkgs.unshift(newPkg);
-            localStorage.setItem("amit_travels_pkgs", JSON.stringify(pkgs));
+            if (editId) {
+                // Update Existing
+                pkgs = pkgs.map(p => p.id == editId ? { id: editId, title, category, state, price, image, details } : p);
+                alert("Package update ho gaya hai!");
+            } else {
+                // Add New
+                const newPkg = { id: String(Date.now()), title, category, state, price, image, details };
+                pkgs.unshift(newPkg);
+                alert("Naya Package add ho gaya hai!");
+            }
 
-            closeAdminPanel();
+            savePackagesToStorage(pkgs);
+            resetForm();
             renderPackages();
-            alert("Naya Tour Package successfully add ho gaya hai!");
+            renderAdminManageList();
+        }
+
+        function editPackage(id) {
+            const pkgs = getPackages();
+            const pkg = pkgs.find(p => p.id == id);
+            if (!pkg) return;
+
+            document.getElementById('editPkgId').value = pkg.id;
+            document.getElementById('pkgTitle').value = pkg.title;
+            document.getElementById('pkgCategory').value = pkg.category;
+            document.getElementById('pkgState').value = pkg.state || '';
+            document.getElementById('pkgPrice').value = pkg.price;
+            document.getElementById('pkgImage').value = pkg.image;
+            document.getElementById('pkgDetails').value = pkg.details;
+
+            document.getElementById('submitBtn').innerText = "Update Package";
+            document.getElementById('cancelEditBtn').classList.remove('hidden');
+
+            switchAdminTab('form');
+        }
+
+        function deletePackage(id) {
+            if (confirm("Kya aap is package ko delete karna chahte hain?")) {
+                let pkgs = getPackages();
+                pkgs = pkgs.filter(p => p.id != id);
+                savePackagesToStorage(pkgs);
+                renderPackages();
+                renderAdminManageList();
+            }
+        }
+
+        function resetForm() {
+            document.getElementById('packageForm').reset();
+            document.getElementById('editPkgId').value = '';
+            document.getElementById('submitBtn').innerText = "+ Add Tour Package";
+            document.getElementById('cancelEditBtn').classList.add('hidden');
+        }
+
+        // Backup & Restore System
+        function exportDataBackup() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(getPackages(), null, 2));
+            const dlAnchorElem = document.createElement('a');
+            dlAnchorElem.setAttribute("href", dataStr);
+            dlAnchorElem.setAttribute("download", "amit_travels_backup.json");
+            dlAnchorElem.click();
+        }
+
+        function importDataBackup() {
+            const fileInput = document.getElementById('importFile');
+            if (!fileInput.files.length) {
+                alert("Kripya ek backup JSON file chunein.");
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedPkgs = JSON.parse(e.target.result);
+                    if (Array.isArray(importedPkgs)) {
+                        savePackagesToStorage(importedPkgs);
+                        renderPackages();
+                        renderAdminManageList();
+                        alert("Data successfully restore ho gaya hai!");
+                        fileInput.value = '';
+                    } else {
+                        alert("Galat Backup File Format!");
+                    }
+                } catch (err) {
+                    alert("File load karne me error aayi!");
+                }
+            };
+            reader.readAsText(fileInput.files[0]);
         }
 
         // Initializing App
