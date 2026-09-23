@@ -6,7 +6,13 @@
     <title>Amit Travels</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Firebase SDK (Compat Version for Easy Single HTML integration) -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -39,7 +45,7 @@
         </div>
     </header>
 
-    <!-- Main Mobile Container -->
+    <!-- Main Mobile App Container -->
     <main class="max-w-md mx-auto p-4 space-y-5">
 
         <!-- Banner Card -->
@@ -52,13 +58,13 @@
             <i class="fa-solid fa-plane-departure absolute -right-4 -bottom-4 text-7xl text-white/10 rotate-12"></i>
         </div>
 
-        <!-- Booking Query Section -->
+        <!-- Ticket Booking Inquiry Section -->
         <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
             <h3 class="text-sm font-bold text-slate-800 mb-3 flex items-center gap-2">
                 <i class="fa-solid fa-ticket text-blue-600"></i> Ticket Booking Request
             </h3>
             
-            <!-- Type Tabs -->
+            <!-- Service Tabs -->
             <div class="grid grid-cols-3 gap-2 mb-4">
                 <button onclick="switchTab('Flight')" id="tab-Flight" class="tab-btn bg-blue-600 text-white py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 shadow-sm">
                     <i class="fa-solid fa-plane"></i> Flight
@@ -103,12 +109,12 @@
                 </div>
 
                 <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl text-xs shadow flex items-center justify-center gap-2 transition">
-                    <i class="fa-brands fa-whatsapp text-lg"></i> Book via WhatsApp
+                    <i class="fa-brands fa-whatsapp text-lg"></i> Send Request on WhatsApp
                 </button>
             </form>
         </div>
 
-        <!-- Tour Category Filters -->
+        <!-- Category Filters -->
         <div>
             <h3 class="text-sm font-bold text-slate-800 mb-2">Tour Packages & Treks</h3>
             <div class="flex gap-2 overflow-x-auto pb-2 scrollbar-none text-xs">
@@ -120,9 +126,9 @@
             </div>
         </div>
 
-        <!-- Tour Packages Container -->
+        <!-- Packages List Container -->
         <div id="packagesList" class="space-y-4">
-            <!-- Dynamically Loaded -->
+            <div class="bg-white p-6 text-center rounded-2xl text-slate-400 text-xs">Loading Packages from Cloud...</div>
         </div>
 
     </main>
@@ -150,7 +156,7 @@
         <div class="bg-white rounded-2xl p-5 w-full max-w-lg space-y-4 shadow-2xl my-6">
             <div class="flex justify-between items-center border-b pb-3">
                 <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
-                    <i class="fa-solid fa-sliders text-blue-600"></i> Admin Management Panel
+                    <i class="fa-solid fa-sliders text-blue-600"></i> Admin Panel (Firebase Cloud)
                 </h3>
                 <button onclick="closeAdminPanel()" class="text-slate-400 text-xl font-bold">&times;</button>
             </div>
@@ -159,11 +165,10 @@
             <div class="flex border-b text-xs font-bold gap-4">
                 <button id="adminTabFormBtn" onclick="switchAdminTab('form')" class="pb-2 border-b-2 border-blue-600 text-blue-600">Add/Edit Package</button>
                 <button id="adminTabManageBtn" onclick="switchAdminTab('manage')" class="pb-2 text-slate-500 border-b-2 border-transparent">Manage Packages (<span id="pkgCount">0</span>)</button>
-                <button id="adminTabBackupBtn" onclick="switchAdminTab('backup')" class="pb-2 text-slate-500 border-b-2 border-transparent">Backup/Restore</button>
             </div>
             
             <!-- Tab 1: Form (Add or Edit) -->
-            <form id="packageForm" onsubmit="savePackage(event)" class="space-y-3">
+            <form id="packageForm" onsubmit="savePackageToFirebase(event)" class="space-y-3">
                 <input type="hidden" id="editPkgId" value="">
                 
                 <div>
@@ -200,7 +205,7 @@
                 
                 <div class="flex gap-2">
                     <button type="submit" id="submitBtn" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-3 rounded-xl shadow transition">
-                        + Add Tour Package
+                        + Save to Firebase
                     </button>
                     <button type="button" id="cancelEditBtn" onclick="resetForm()" class="hidden bg-slate-200 text-slate-700 text-xs font-bold px-4 rounded-xl">
                         Cancel
@@ -210,88 +215,91 @@
 
             <!-- Tab 2: Manage List (Edit & Delete Buttons) -->
             <div id="adminManageSection" class="hidden space-y-2 max-h-80 overflow-y-auto pr-1">
-                <!-- Loaded via JS -->
+                <!-- Dynamically loaded -->
             </div>
-
-            <!-- Tab 3: Backup & Restore (Storage Safety) -->
-            <div id="adminBackupSection" class="hidden space-y-4 text-xs">
-                <div class="p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-800">
-                    <i class="fa-solid fa-shield-halved"></i> <strong>Storage Protection:</strong> Apne packages ka backup JSON file me download karein taaki data kabhi loss na ho.
-                </div>
-                
-                <div class="space-y-2">
-                    <h4 class="font-bold text-slate-700">1. Download Data Backup</h4>
-                    <button onclick="exportDataBackup()" class="w-full bg-emerald-600 text-white font-bold py-2.5 rounded-xl flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-download"></i> Download Backup File (.json)
-                    </button>
-                </div>
-
-                <div class="space-y-2 pt-2 border-t">
-                    <h4 class="font-bold text-slate-700">2. Restore Data from File</h4>
-                    <input type="file" id="importFile" accept=".json" class="w-full text-xs p-2 border rounded-xl bg-slate-50">
-                    <button onclick="importDataBackup()" class="w-full bg-indigo-600 text-white font-bold py-2.5 rounded-xl flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-upload"></i> Restore Backup
-                    </button>
-                </div>
-            </div>
-
         </div>
     </div>
 
-    <!-- Script Logic -->
+    <!-- Script Logic with Firebase Integration -->
     <script>
         const WHATSAPP_NUM = "918521694137";
         const ADMIN_PASS = "Amit855102@";
 
-        const defaultPackages = [
+        // AAPKA GOOGLE FIREBASE CONFIG
+        const firebaseConfig = {
+            apiKey: "AIzaSyBnG-2Utm4flaoXoZC9xHNAyrmYqgsCIJk",
+            authDomain: "amit-travels-a95ce.firebaseapp.com",
+            projectId: "amit-travels-a95ce",
+            storageBucket: "amit-travels-a95ce.firebasestorage.app",
+            messagingSenderId: "835627332598",
+            appId: "1:835627332598:web:d49da56192fb9f433d4dd7",
+            measurementId: "G-9F07NM1XS1"
+        };
+
+        // Firebase Initialize
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        let currentPackages = [];
+        let currentFilter = "all";
+
+        // Initial Data Seed if Database is empty
+        const defaultSamplePackages = [
             {
-                id: "1693800000001",
                 title: "1 Day Nandi Hills & Bangalore Sightseeing",
                 category: "Bangalore",
                 state: "Karnataka",
                 price: "1,499",
                 image: "https://images.unsplash.com/photo-1596176530529-78163a4f7af2?w=500&q=80",
-                details: "Pickup & Drop, Nandi Hills sunrise, Botanical Garden & Temple visit included."
+                details: "Pickup & Drop, Nandi Hills sunrise, Botanical Garden & Temple visit included.",
+                createdAt: Date.now()
             },
             {
-                id: "1693800000002",
                 title: "Romantic Goa Beach Honeymoon Package",
                 category: "Honeymoon",
                 state: "Goa",
                 price: "12,999",
                 image: "https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?w=500&q=80",
-                details: "4 Days 3 Nights stay, Resort, Candlelight Dinner, Beach Tours & Cruise."
+                details: "4 Days 3 Nights stay, Resort, Candlelight Dinner, Beach Tours & Cruise.",
+                createdAt: Date.now() - 1000
             },
             {
-                id: "1693800000003",
                 title: "Exotic Bali Island Paradise Tour",
                 category: "International",
                 state: "Indonesia",
                 price: "34,999",
                 image: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=500&q=80",
-                details: "5 Days trip covering Ubud, Waterfalls, Temple tour & Kuta Beach."
+                details: "5 Days trip covering Ubud, Waterfalls, Temple tour & Kuta Beach.",
+                createdAt: Date.now() - 2000
             }
         ];
 
-        function getPackages() {
-            const stored = localStorage.getItem("amit_travels_pkgs");
-            if (!stored) {
-                localStorage.setItem("amit_travels_pkgs", JSON.stringify(defaultPackages));
-                return defaultPackages;
+        // Real-Time Firebase Listener
+        db.collection("packages").orderBy("createdAt", "desc").onSnapshot((snapshot) => {
+            if (snapshot.empty) {
+                // Seed initial data if empty
+                defaultSamplePackages.forEach(pkg => db.collection("packages").add(pkg));
+                return;
             }
-            return JSON.parse(stored);
-        }
 
-        function savePackagesToStorage(pkgs) {
-            localStorage.setItem("amit_travels_pkgs", JSON.stringify(pkgs));
-        }
+            currentPackages = [];
+            snapshot.forEach(doc => {
+                currentPackages.push({ id: doc.id, ...doc.data() });
+            });
 
+            renderPackages(currentFilter);
+            renderAdminManageList();
+        }, (error) => {
+            console.error("Firebase Error: ", error);
+            document.getElementById("packagesList").innerHTML = `<div class="bg-red-50 p-4 text-center rounded-2xl text-red-500 text-xs font-semibold">Firebase Connection Error! Check Database Rules.</div>`;
+        });
+
+        // UI Rendering Functions
         function renderPackages(filter = "all") {
             const list = document.getElementById("packagesList");
-            const packages = getPackages();
             list.innerHTML = "";
 
-            const filtered = packages.filter(pkg => {
+            const filtered = currentPackages.filter(pkg => {
                 if (filter === "all") return true;
                 return pkg.category.toLowerCase() === filter.toLowerCase() || 
                        (pkg.state && pkg.state.toLowerCase().includes(filter.toLowerCase()));
@@ -328,15 +336,14 @@
 
         function renderAdminManageList() {
             const container = document.getElementById("adminManageSection");
-            const packages = getPackages();
-            document.getElementById("pkgCount").innerText = packages.length;
+            document.getElementById("pkgCount").innerText = currentPackages.length;
 
-            if (packages.length === 0) {
+            if (currentPackages.length === 0) {
                 container.innerHTML = `<div class="text-center py-4 text-xs text-slate-400">No packages available. Add one now!</div>`;
                 return;
             }
 
-            container.innerHTML = packages.map(pkg => `
+            container.innerHTML = currentPackages.map(pkg => `
                 <div class="p-3 border rounded-xl bg-slate-50 flex items-center justify-between gap-2">
                     <div class="flex items-center gap-2 overflow-hidden">
                         <img src="${pkg.image}" class="w-10 h-10 rounded-lg object-cover flex-shrink-0" onerror="this.src='https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=500&q=80'">
@@ -398,6 +405,7 @@
         }
 
         function filterCategory(cat, evt) {
+            currentFilter = cat;
             document.querySelectorAll('.cat-btn').forEach(btn => {
                 btn.className = "cat-btn bg-white text-slate-600 border border-slate-200 px-3.5 py-1.5 rounded-full font-semibold whitespace-nowrap";
             });
@@ -405,7 +413,7 @@
             renderPackages(cat);
         }
 
-        // Admin Modals
+        // Admin Security & Modal Logic
         function openAdminModal() {
             document.getElementById('adminAuthModal').classList.remove('hidden');
         }
@@ -418,9 +426,8 @@
                 closeAdminModal();
                 document.getElementById('adminPasswordInput').value = '';
                 document.getElementById('adminPanelModal').classList.remove('hidden');
-                renderAdminManageList();
             } else {
-                alert("Galat Password! Password hai: Amit855102@");
+                alert("Galat Password!");
             }
         }
         function closeAdminPanel() {
@@ -431,11 +438,9 @@
         function switchAdminTab(tab) {
             document.getElementById('packageForm').classList.add('hidden');
             document.getElementById('adminManageSection').classList.add('hidden');
-            document.getElementById('adminBackupSection').classList.add('hidden');
 
             document.getElementById('adminTabFormBtn').className = "pb-2 text-slate-500 border-b-2 border-transparent";
             document.getElementById('adminTabManageBtn').className = "pb-2 text-slate-500 border-b-2 border-transparent";
-            document.getElementById('adminTabBackupBtn').className = "pb-2 text-slate-500 border-b-2 border-transparent";
 
             if (tab === 'form') {
                 document.getElementById('packageForm').classList.remove('hidden');
@@ -443,15 +448,11 @@
             } else if (tab === 'manage') {
                 document.getElementById('adminManageSection').classList.remove('hidden');
                 document.getElementById('adminTabManageBtn').className = "pb-2 border-b-2 border-blue-600 text-blue-600 font-bold";
-                renderAdminManageList();
-            } else if (tab === 'backup') {
-                document.getElementById('adminBackupSection').classList.remove('hidden');
-                document.getElementById('adminTabBackupBtn').className = "pb-2 border-b-2 border-blue-600 text-blue-600 font-bold";
             }
         }
 
-        // Add / Update Package Logic
-        function savePackage(e) {
+        // Firebase Database Add / Update Logic
+        async function savePackageToFirebase(e) {
             e.preventDefault();
             const editId = document.getElementById('editPkgId').value;
             const title = document.getElementById('pkgTitle').value;
@@ -461,28 +462,27 @@
             const image = document.getElementById('pkgImage').value;
             const details = document.getElementById('pkgDetails').value;
 
-            let pkgs = getPackages();
+            const pkgData = {
+                title, category, state, price, image, details,
+                createdAt: Date.now()
+            };
 
-            if (editId) {
-                // Update Existing
-                pkgs = pkgs.map(p => p.id == editId ? { id: editId, title, category, state, price, image, details } : p);
-                alert("Package update ho gaya hai!");
-            } else {
-                // Add New
-                const newPkg = { id: String(Date.now()), title, category, state, price, image, details };
-                pkgs.unshift(newPkg);
-                alert("Naya Package add ho gaya hai!");
+            try {
+                if (editId) {
+                    await db.collection("packages").doc(editId).update(pkgData);
+                    alert("Package update ho gaya!");
+                } else {
+                    await db.collection("packages").add(pkgData);
+                    alert("Package Cloud Database me save ho gaya!");
+                }
+                resetForm();
+            } catch (err) {
+                alert("Error saving data: " + err.message);
             }
-
-            savePackagesToStorage(pkgs);
-            resetForm();
-            renderPackages();
-            renderAdminManageList();
         }
 
         function editPackage(id) {
-            const pkgs = getPackages();
-            const pkg = pkgs.find(p => p.id == id);
+            const pkg = currentPackages.find(p => p.id === id);
             if (!pkg) return;
 
             document.getElementById('editPkgId').value = pkg.id;
@@ -499,61 +499,23 @@
             switchAdminTab('form');
         }
 
-        function deletePackage(id) {
-            if (confirm("Kya aap is package ko delete karna chahte hain?")) {
-                let pkgs = getPackages();
-                pkgs = pkgs.filter(p => p.id != id);
-                savePackagesToStorage(pkgs);
-                renderPackages();
-                renderAdminManageList();
+        async function deletePackage(id) {
+            if (confirm("Kya aap is package ko Cloud Database se delete karna chahte hain?")) {
+                try {
+                    await db.collection("packages").doc(id).delete();
+                    alert("Package delete ho gaya!");
+                } catch (err) {
+                    alert("Error deleting: " + err.message);
+                }
             }
         }
 
         function resetForm() {
             document.getElementById('packageForm').reset();
             document.getElementById('editPkgId').value = '';
-            document.getElementById('submitBtn').innerText = "+ Add Tour Package";
+            document.getElementById('submitBtn').innerText = "+ Save to Firebase";
             document.getElementById('cancelEditBtn').classList.add('hidden');
         }
-
-        // Backup & Restore System
-        function exportDataBackup() {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(getPackages(), null, 2));
-            const dlAnchorElem = document.createElement('a');
-            dlAnchorElem.setAttribute("href", dataStr);
-            dlAnchorElem.setAttribute("download", "amit_travels_backup.json");
-            dlAnchorElem.click();
-        }
-
-        function importDataBackup() {
-            const fileInput = document.getElementById('importFile');
-            if (!fileInput.files.length) {
-                alert("Kripya ek backup JSON file chunein.");
-                return;
-            }
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const importedPkgs = JSON.parse(e.target.result);
-                    if (Array.isArray(importedPkgs)) {
-                        savePackagesToStorage(importedPkgs);
-                        renderPackages();
-                        renderAdminManageList();
-                        alert("Data successfully restore ho gaya hai!");
-                        fileInput.value = '';
-                    } else {
-                        alert("Galat Backup File Format!");
-                    }
-                } catch (err) {
-                    alert("File load karne me error aayi!");
-                }
-            };
-            reader.readAsText(fileInput.files[0]);
-        }
-
-        // Initializing App
-        renderPackages();
     </script>
 </body>
 </html>
