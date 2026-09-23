@@ -1,0 +1,1472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amit Travels - Modern Travel & Tour Packages</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- React & Babel CDNs for single file React App -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: {
+                            800: '#1e293b',
+                            900: '#0f172a',
+                            950: '#020617'
+                        },
+                        brand: {
+                            blue: '#2563eb',
+                            emerald: '#10b981',
+                            gold: '#f59e0b',
+                            rose: '#f43f5e'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom App UI styling & scrollbars */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .glass-card {
+            background: rgba(30, 41, 59, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .glass-modal {
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(16px);
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen antialiased">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const LOGO_URL = "https://i.postimg.cc/fkQ0YK8D/A8BDDCEC-7216-44C5-8125-DC1E6122EC5C.png";
+        const WHATSAPP_NUMBER = "918521694137";
+        const ADMIN_PASSWORD = "Amit855102@";
+
+        const INITIAL_PACKAGES = [
+            {
+                id: 'pkg-1',
+                title: 'Nandi Hills Sunrise & Vineyards Tour',
+                category: 'One Day Trip Bangalore',
+                state: 'Karnataka',
+                image: 'https://images.unsplash.com/photo-1590050752117-238cb0fb12b1?auto=format&fit=crop&w=800&q=80',
+                price: 1299,
+                originalPrice: 1999,
+                duration: '1 Day (5 AM - 6 PM)',
+                dates: ['Tomorrow', 'Upcoming Saturday', 'Upcoming Sunday'],
+                highlights: ['Nandi Hills Fortress', 'Grover Zampa Vineyard', 'Breakfast Included', 'Private Cab / Bus'],
+                description: 'Escape the city hustle with an early morning drive to Nandi Hills for breathtaking sunrise views, followed by vineyard exploration.'
+            },
+            {
+                id: 'pkg-2',
+                title: 'Romantic Bali Island Honeymoon Special',
+                category: 'Honeymoon Package',
+                state: 'International',
+                image: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=800&q=80',
+                price: 45999,
+                originalPrice: 59999,
+                duration: '6 Days / 5 Nights',
+                dates: ['Flexible Departure', '15th Next Month', '25th Next Month'],
+                highlights: ['Private Pool Villa', 'Candlelight Dinner', 'Water Sports at Nusa Dua', 'Ubud Tour'],
+                description: 'Unforgettable romantic getaway to Bali with luxury beachside resorts, scenic waterfalls, and candlelit dinners.'
+            },
+            {
+                id: 'pkg-3',
+                title: 'Coorg & Chikkamagaluru Coffee Estate Trail',
+                category: 'Tour Packages',
+                state: 'Karnataka',
+                image: 'https://images.unsplash.com/photo-1582510003544-4d00b7f74220?auto=format&fit=crop&w=800&q=80',
+                price: 4999,
+                originalPrice: 6999,
+                duration: '3 Days / 2 Nights',
+                dates: ['Every Friday Night Departure', '12 Oct', '20 Oct'],
+                highlights: ['Abbey Falls Visit', 'Mullayanagiri Peak Trek', 'Coffee Estate Walk', 'Campfire & BBQ'],
+                description: 'Explore the Scotland of India with lush green misty hills, waterfalls, and rich coffee plantations.'
+            },
+            {
+                id: 'pkg-4',
+                title: 'Kedarnath & Badrinath Divine Trek',
+                category: 'State Trek',
+                state: 'Uttarakhand',
+                image: 'https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?auto=format&fit=crop&w=800&q=80',
+                price: 12499,
+                originalPrice: 15999,
+                duration: '6 Days / 5 Nights',
+                dates: ['05 May', '18 May', '02 June', '15 June'],
+                highlights: ['Helicopter / Trek Option', 'Rishikesh Aarti', 'Pristine Himalayan Views', 'Guided Trekking'],
+                description: 'Sacred pilgrimage and scenic trek through the breathtaking Garhwal Himalayas.'
+            },
+            {
+                id: 'pkg-5',
+                title: 'Kasol & Tosh Valley Backpacking Trek',
+                category: 'State Trek',
+                state: 'Himachal Pradesh',
+                image: 'https://images.unsplash.com/photo-1605649487212-47bdab064df7?auto=format&fit=crop&w=800&q=80',
+                price: 6800,
+                originalPrice: 8999,
+                duration: '4 Days / 3 Nights',
+                dates: ['Every Thursday', '10 Oct', '18 Oct', '25 Oct'],
+                highlights: ['Parvati River Camping', 'Tosh Waterfall Hike', 'Cafes of Kasol', 'Bonfire & DJ Night'],
+                description: 'Popular trek for youth and nature lovers into the heart of Parvati Valley in Himachal.'
+            },
+            {
+                id: 'pkg-6',
+                title: 'Dubai Desert Safari & City Experience',
+                category: 'International Trips',
+                state: 'International',
+                image: 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=800&q=80',
+                price: 38999,
+                originalPrice: 48999,
+                duration: '5 Days / 4 Nights',
+                dates: ['08 Nov', '20 Nov', '05 Dec', '15 Dec'],
+                highlights: ['Burj Khalifa 124th Floor', 'Desert Safari with BBQ', 'Dhow Cruise Dinner', 'Miracle Garden'],
+                description: 'Experience futuristic skyscrapers, luxury shopping, and golden desert dunes in Dubai.'
+            },
+            {
+                id: 'pkg-7',
+                title: 'Kerala Backwaters & Munnar Honeymoon',
+                category: 'Honeymoon Package',
+                state: 'Kerala',
+                image: 'https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?auto=format&fit=crop&w=800&q=80',
+                price: 18500,
+                originalPrice: 24000,
+                duration: '5 Days / 4 Nights',
+                dates: ['On Customer Request', 'Weekly departures'],
+                highlights: ['Private Houseboat Cruise in Alleppey', 'Tea Gardens Munnar', 'Spice Plantation', 'Flower Decoration'],
+                description: 'Cruise tranquil backwaters in Alleppey and relax amidst tea plantations of Munnar.'
+            },
+            {
+                id: 'pkg-8',
+                title: 'Goa Beach Party & Watersports Weekend',
+                category: 'Tour Packages',
+                state: 'Goa',
+                image: 'https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&w=800&q=80',
+                price: 5500,
+                originalPrice: 7999,
+                duration: '3 Days / 2 Nights',
+                dates: ['Fri Departures', '14 Oct', '21 Oct', '28 Oct'],
+                highlights: ['Scuba Diving & Parasailing', 'Baga & Calangute Beach', 'Cruise with Dance', 'Resort Stay with Breakfast'],
+                description: 'Relax on sun-kissed beaches, try thrilling water activities, and enjoy vibrant nightlife.'
+            }
+        ];
+
+        const STATES_LIST = ['All States', 'Karnataka', 'Himachal Pradesh', 'Kerala', 'Uttarakhand', 'Goa', 'Rajasthan', 'International'];
+
+        function App() {
+            // Persistent Packages State
+            const [packages, setPackages] = React.useState(() => {
+                const saved = localStorage.getItem('AMIT_TRAVELS_PACKAGES');
+                return saved ? JSON.parse(saved) : INITIAL_PACKAGES;
+            });
+
+            React.useEffect(() => {
+                localStorage.setItem('AMIT_TRAVELS_PACKAGES', JSON.stringify(packages));
+            }, [packages]);
+
+            // App Navigation & Filters State
+            const [activeTab, setActiveTab] = React.useState('home'); // home, tickets, packages, admin
+            const [categoryFilter, setCategoryFilter] = React.useState('All');
+            const [selectedState, setSelectedState] = React.useState('All States');
+            const [searchQuery, setSearchQuery] = React.useState('');
+
+            // Modals State
+            const [bookingModalPkg, setBookingModalPkg] = React.useState(null);
+            const [selectedPkgDetail, setSelectedPkgDetail] = React.useState(null);
+            const [isAdminAuthModalOpen, setIsAdminAuthModalOpen] = React.useState(false);
+            const [adminPassInput, setAdminPassInput] = React.useState('');
+            const [adminError, setAdminError] = React.useState('');
+            const [isAdminLoggedIn, setIsAdminLoggedIn] = React.useState(false);
+
+            // Toast Alert state
+            const [toast, setToast] = React.useState(null);
+            const showToast = (msg, type = 'success') => {
+                setToast({ msg, type });
+                setTimeout(() => setToast(null), 3500);
+            };
+
+            // Ticket Search Widget State (Train, Flight, Bus)
+            const [ticketType, setTicketType] = React.useState('train'); // train, flight, bus
+            const [ticketForm, setTicketForm] = React.useState({
+                fromCity: '',
+                toCity: '',
+                travelers: '1 Passenger',
+                travelClass: 'Sleeper / Economy',
+                dates: ['', '', '', ''] // Up to 4 dates
+            });
+
+            // Admin Package Form State
+            const [editingPkg, setEditingPkg] = React.useState(null);
+            const [pkgForm, setPkgForm] = React.useState({
+                title: '',
+                category: 'Tour Packages',
+                state: 'Karnataka',
+                image: '',
+                price: '',
+                originalPrice: '',
+                duration: '',
+                dates: ['', '', ''],
+                highlights: '',
+                description: ''
+            });
+
+            // Booking Form State
+            const [bookingCustomer, setBookingCustomer] = React.useState({
+                name: '',
+                phone: '',
+                travelersCount: '2 Adults',
+                selectedDate: '',
+                customDates: '',
+                notes: ''
+            });
+
+            const handleDirectTicketWhatsApp = (e) => {
+                e.preventDefault();
+                if (!ticketForm.fromCity || !ticketForm.toCity) {
+                    showToast('Please enter From and To city locations!', 'error');
+                    return;
+                }
+
+                const validDates = ticketForm.dates.filter(d => d.trim() !== '');
+                const datesText = validDates.length > 0 ? validDates.join(', ') : 'Flexible Dates';
+
+                const message = `*NEW ${ticketType.toUpperCase()} TICKET BOOKING ENQUIRY - AMIT TRAVELS*\n` +
+                    `--------------------------------------\n` +
+                    `*Service:* ${ticketType.toUpperCase()} TICKET\n` +
+                    `*From:* ${ticketForm.fromCity}\n` +
+                    `*To:* ${ticketForm.toCity}\n` +
+                    `*Class/Type:* ${ticketForm.travelClass}\n` +
+                    `*Passengers:* ${ticketForm.travelers}\n` +
+                    `*Preferred Dates (Selected 3-4 options):* ${datesText}\n` +
+                    `--------------------------------------\n` +
+                    `Please check seat availability and best fares for me.`;
+
+                const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+                window.open(url, '_blank');
+                showToast('Opening WhatsApp with ticket details...', 'success');
+            };
+
+            const handlePackageBookingSubmit = (e) => {
+                e.preventDefault();
+                if (!bookingCustomer.name || !bookingCustomer.phone) {
+                    showToast('Please provide your Name and Phone Number!', 'error');
+                    return;
+                }
+
+                const datesChosen = bookingCustomer.selectedDate || bookingCustomer.customDates || 'Flexible Departure';
+                const pkgName = bookingModalPkg ? bookingModalPkg.title : 'Custom Package Enquiry';
+                const priceText = bookingModalPkg ? `₹${bookingModalPkg.price}` : 'As per quotation';
+
+                const message = `*NEW TOUR BOOKING - AMIT TRAVELS*\n` +
+                    `--------------------------------------\n` +
+                    `*Package:* ${pkgName}\n` +
+                    `*Category:* ${bookingModalPkg ? bookingModalPkg.category : 'General'}\n` +
+                    `*State/Destination:* ${bookingModalPkg ? bookingModalPkg.state : 'Multiple'}\n` +
+                    `*Price:* ${priceText}\n` +
+                    `--------------------------------------\n` +
+                    `*Customer Name:* ${bookingCustomer.name}\n` +
+                    `*Phone Number:* ${bookingCustomer.phone}\n` +
+                    `*Travelers:* ${bookingCustomer.travelersCount}\n` +
+                    `*Selected Departure Date(s):* ${datesChosen}\n` +
+                    `*Special Request/Notes:* ${bookingCustomer.notes || 'None'}\n` +
+                    `--------------------------------------\n` +
+                    `Please confirm availability and share itinerary details.`;
+
+                const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+                window.open(url, '_blank');
+                setBookingModalPkg(null);
+                showToast('Booking details sent to Amit Travels WhatsApp!', 'success');
+            };
+
+            const handleAdminLogin = (e) => {
+                e.preventDefault();
+                if (adminPassInput === ADMIN_PASSWORD) {
+                    setIsAdminLoggedIn(true);
+                    setIsAdminAuthModalOpen(false);
+                    setAdminPassInput('');
+                    setAdminError('');
+                    setActiveTab('admin');
+                    showToast('Admin Logged in successfully!', 'success');
+                } else {
+                    setAdminError('Invalid Admin Password! Please try again.');
+                }
+            };
+
+            const handleSavePackage = (e) => {
+                e.preventDefault();
+                if (!pkgForm.title || !pkgForm.price || !pkgForm.image) {
+                    showToast('Please fill required fields (Title, Price, Image URL)', 'error');
+                    return;
+                }
+
+                const highlightsArr = typeof pkgForm.highlights === 'string' 
+                    ? pkgForm.highlights.split(',').map(h => h.trim()).filter(Boolean)
+                    : pkgForm.highlights;
+
+                const datesArr = Array.isArray(pkgForm.dates) 
+                    ? pkgForm.dates.filter(d => d.trim() !== '')
+                    : [pkgForm.dates];
+
+                if (editingPkg) {
+                    const updated = packages.map(p => p.id === editingPkg.id ? {
+                        ...pkgForm,
+                        id: editingPkg.id,
+                        price: Number(pkgForm.price),
+                        originalPrice: Number(pkgForm.originalPrice || pkgForm.price * 1.3),
+                        highlights: highlightsArr,
+                        dates: datesArr.length > 0 ? datesArr : ['Flexible Dates']
+                    } : p);
+                    setPackages(updated);
+                    showToast('Package updated successfully!');
+                } else {
+                    const newPkg = {
+                        ...pkgForm,
+                        id: 'pkg-' + Date.now(),
+                        price: Number(pkgForm.price),
+                        originalPrice: Number(pkgForm.originalPrice || pkgForm.price * 1.3),
+                        highlights: highlightsArr,
+                        dates: datesArr.length > 0 ? datesArr : ['Flexible Dates']
+                    };
+                    setPackages([newPkg, ...packages]);
+                    showToast('New Package added successfully!');
+                }
+
+                // Reset Form
+                setEditingPkg(null);
+                setPkgForm({
+                    title: '',
+                    category: 'Tour Packages',
+                    state: 'Karnataka',
+                    image: '',
+                    price: '',
+                    originalPrice: '',
+                    duration: '',
+                    dates: ['', '', ''],
+                    highlights: '',
+                    description: ''
+                });
+            };
+
+            const handleDeletePackage = (id) => {
+                if (window.confirm('Are you sure you want to delete this tour package?')) {
+                    setPackages(packages.filter(p => p.id !== id));
+                    showToast('Package deleted!', 'error');
+                }
+            };
+
+            const startEditPackage = (pkg) => {
+                setEditingPkg(pkg);
+                setPkgForm({
+                    title: pkg.title,
+                    category: pkg.category,
+                    state: pkg.state,
+                    image: pkg.image,
+                    price: pkg.price,
+                    originalPrice: pkg.originalPrice,
+                    duration: pkg.duration,
+                    dates: pkg.dates || ['', '', ''],
+                    highlights: Array.isArray(pkg.highlights) ? pkg.highlights.join(', ') : pkg.highlights,
+                    description: pkg.description
+                });
+            };
+
+            const resetDefaultPackages = () => {
+                if (window.confirm('Reset all tour packages to default data?')) {
+                    setPackages(INITIAL_PACKAGES);
+                    localStorage.removeItem('AMIT_TRAVELS_PACKAGES');
+                    showToast('Reset to default packages done!');
+                }
+            };
+
+            const filteredPackages = packages.filter(pkg => {
+                const matchesCategory = categoryFilter === 'All' || pkg.category === categoryFilter;
+                const matchesState = selectedState === 'All States' || pkg.state === selectedState;
+                const matchesSearch = pkg.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                                      pkg.state.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                                      pkg.category.toLowerCase().includes(searchQuery.toLowerCase());
+                return matchesCategory && matchesState && matchesSearch;
+            });
+
+            return (
+                <div class="min-h-screen flex flex-col pb-20 md:pb-8 bg-slate-900 text-slate-100">
+                    {}
+                    <header class="sticky top-0 z-40 glass-card border-b border-slate-800 shadow-lg">
+                        <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+                            {/* Logo & Title */}
+                            <div class="flex items-center gap-3 cursor-pointer" onClick={() => setActiveTab('home')}>
+                                <img 
+                                    src={LOGO_URL} 
+                                    alt="Amit Travels Logo" 
+                                    class="h-11 w-11 rounded-xl object-cover ring-2 ring-blue-500 shadow-md"
+                                    onError={(e)=>{ e.target.onerror = null; e.target.src="https://placehold.co/100x100/1e293b/ffffff?text=AT"; }}
+                                />
+                                <div>
+                                    <h1 class="text-xl font-black tracking-wider text-white flex items-center gap-1.5">
+                                        AMIT <span class="text-blue-500">TRAVELS</span>
+                                    </h1>
+                                    <p class="text-xs text-emerald-400 font-medium">Your Trusted Travel Partner</p>
+                                </div>
+                            </div>
+
+                            {/* Desktop Navigation Links */}
+                            <nav class="hidden md:flex items-center gap-6 text-sm font-semibold">
+                                <button 
+                                    onClick={() => setActiveTab('home')} 
+                                    class={`hover:text-blue-400 transition-colors ${activeTab === 'home' ? 'text-blue-500 underline underline-offset-8 decoration-2' : 'text-slate-300'}`}
+                                >
+                                    Home & Packages
+                                </button>
+                                <button 
+                                    onClick={() => setActiveTab('tickets')} 
+                                    class={`hover:text-blue-400 transition-colors ${activeTab === 'tickets' ? 'text-blue-500 underline underline-offset-8 decoration-2' : 'text-slate-300'}`}
+                                >
+                                    Book Tickets
+                                </button>
+                                {isAdminLoggedIn ? (
+                                    <button 
+                                        onClick={() => setActiveTab('admin')} 
+                                        class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5 shadow"
+                                    >
+                                        <i class="fa-solid fa-user-gear"></i> Admin Panel
+                                    </button>
+                                ) : (
+                                    <button 
+                                        onClick={() => setIsAdminAuthModalOpen(true)} 
+                                        class="text-slate-400 hover:text-white transition-colors text-xs flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded-lg border border-slate-700"
+                                    >
+                                        <i class="fa-solid fa-lock"></i> Admin Login
+                                    </button>
+                                )}
+                            </nav>
+
+                            {/* Direct WhatsApp Call Button */}
+                            <a 
+                                href={`https://wa.me/${WHATSAPP_NUMBER}`} 
+                                target="_blank" 
+                                rel="noreferrer" 
+                                class="bg-emerald-600 hover:bg-emerald-500 text-white px-3.5 py-2 rounded-xl font-bold text-xs flex items-center gap-2 shadow-lg shadow-emerald-900/30 transition-all transform hover:scale-105"
+                            >
+                                <i class="fa-brands fa-whatsapp text-lg"></i>
+                                <span class="hidden sm:inline">WhatsApp Help</span>
+                            </a>
+                        </div>
+                    </header>
+
+                    {/* Toast Alert Popup */}
+                    {toast && (
+                        <div class="fixed top-16 right-4 z-50 animate-bounce">
+                            <div class={`px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 text-sm font-semibold text-white border ${toast.type === 'error' ? 'bg-rose-600 border-rose-400' : 'bg-emerald-600 border-emerald-400'}`}>
+                                <i class={`fa-solid ${toast.type === 'error' ? 'fa-circle-exclamation' : 'fa-circle-check'} text-lg`}></i>
+                                <span>{toast.msg}</span>
+                            </div>
+                        </div>
+                    )}
+
+                    {}
+                    <main class="max-w-7xl mx-auto px-4 py-6 flex-1 w-full">
+
+                        {/* VIEW 1: HOME & TOUR PACKAGES */}
+                        {activeTab === 'home' && (
+                            <div>
+                                {/* Hero Banner */}
+                                <div class="relative rounded-3xl overflow-hidden mb-8 p-6 md:p-10 bg-gradient-to-r from-blue-900 via-slate-900 to-indigo-950 border border-slate-800 shadow-2xl">
+                                    <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=1200&q=80')] bg-cover bg-center opacity-10"></div>
+                                    <div class="relative z-10 max-w-2xl">
+                                        <span class="inline-block px-3 py-1 bg-blue-500/20 text-blue-400 border border-blue-500/30 rounded-full text-xs font-semibold mb-3">
+                                            ✈️ Premier Travel Booking Hub
+                                        </span>
+                                        <h2 class="text-3xl md:text-5xl font-extrabold text-white tracking-tight leading-tight mb-3">
+                                            Explore The World With <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400">Amit Travels</span>
+                                        </h2>
+                                        <p class="text-slate-300 text-sm md:text-base mb-6">
+                                            Book Flights, Train & Bus tickets with flexible dates option. Discover Honeymoon Packages, State Treks, and One-Day trips from Bangalore.
+                                        </p>
+                                        <div class="flex flex-wrap gap-3">
+                                            <button 
+                                                onClick={() => setActiveTab('tickets')} 
+                                                class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-5 py-2.5 rounded-xl text-sm shadow-lg shadow-blue-600/30 transition-all flex items-center gap-2"
+                                            >
+                                                <i class="fa-solid fa-ticket"></i> Book Train / Flight / Bus
+                                            </button>
+                                            <a 
+                                                href="#packages-section" 
+                                                class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-semibold px-5 py-2.5 rounded-xl text-sm transition-all flex items-center gap-2"
+                                            >
+                                                <i class="fa-solid fa-compass"></i> Explore Packages
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {}
+                                <div class="glass-card rounded-2xl p-4 md:p-6 mb-8 border border-slate-800 shadow-xl">
+                                    <div class="flex items-center justify-between mb-4">
+                                        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                                            <i class="fa-solid fa-paper-plane text-blue-400"></i> Quick Ticket Booking Enquiries
+                                        </h3>
+                                        <span class="text-xs text-emerald-400 bg-emerald-950/60 border border-emerald-800 px-2.5 py-1 rounded-full font-medium">
+                                            Multi-Date Selection Available
+                                        </span>
+                                    </div>
+
+                                    {/* Ticket Category Tabs */}
+                                    <div class="flex gap-2 border-b border-slate-700/60 pb-3 mb-4">
+                                        <button 
+                                            onClick={() => setTicketType('train')} 
+                                            class={`px-4 py-2 rounded-xl font-bold text-xs transition-all flex items-center gap-2 ${ticketType === 'train' ? 'bg-blue-600 text-white shadow-md' : 'bg-slate-800 text-slate-400 hover:text-slate-200'}`}
+                                        >
+                                            <i class="fa-solid fa-train"></i> Train Ticket
+                                        </button>
+                                        <button 
+                                            onClick={() => setTicketType('flight')} 
+                                            class={`px-4 py-2 rounded-xl font-bold text-xs transition-all flex items-center gap-2 ${ticketType === 'flight' ? 'bg-blue-600 text-white shadow-md' : 'bg-slate-800 text-slate-400 hover:text-slate-200'}`}
+                                        >
+                                            <i class="fa-solid fa-plane-departure"></i> Flight Ticket
+                                        </button>
+                                        <button 
+                                            onClick={() => setTicketType('bus')} 
+                                            class={`px-4 py-2 rounded-xl font-bold text-xs transition-all flex items-center gap-2 ${ticketType === 'bus' ? 'bg-blue-600 text-white shadow-md' : 'bg-slate-800 text-slate-400 hover:text-slate-200'}`}
+                                        >
+                                            <i class="fa-solid fa-bus"></i> Bus Ticket
+                                        </button>
+                                    </div>
+
+                                    <form onSubmit={handleDirectTicketWhatsApp} class="space-y-4">
+                                        <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+                                            <div>
+                                                <label class="text-xs font-semibold text-slate-400 block mb-1">From City</label>
+                                                <input 
+                                                    type="text" 
+                                                    placeholder="e.g. Bangalore" 
+                                                    value={ticketForm.fromCity} 
+                                                    onChange={(e) => setTicketForm({...ticketForm, fromCity: e.target.value})} 
+                                                    class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500"
+                                                    required
+                                                />
+                                            </div>
+                                            <div>
+                                                <label class="text-xs font-semibold text-slate-400 block mb-1">To Destination</label>
+                                                <input 
+                                                    type="text" 
+                                                    placeholder="e.g. Delhi / Goa / Patna" 
+                                                    value={ticketForm.toCity} 
+                                                    onChange={(e) => setTicketForm({...ticketForm, toCity: e.target.value})} 
+                                                    class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500"
+                                                    required
+                                                />
+                                            </div>
+                                            <div>
+                                                <label class="text-xs font-semibold text-slate-400 block mb-1">Class / Category</label>
+                                                <select 
+                                                    value={ticketForm.travelClass} 
+                                                    onChange={(e) => setTicketForm({...ticketForm, travelClass: e.target.value})} 
+                                                    class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500"
+                                                >
+                                                    {ticketType === 'train' && (
+                                                        <>
+                                                            <option value="3AC / 2AC / 1AC">3AC / 2AC / 1AC Premium</option>
+                                                            <option value="Sleeper Class (SL)">Sleeper Class (SL)</option>
+                                                            <option value="Tatkal / General Request">Tatkal / Priority Request</option>
+                                                        </>
+                                                    )}
+                                                    {ticketType === 'flight' && (
+                                                        <>
+                                                            <option value="Economy Class">Economy Class</option>
+                                                            <option value="Premium Economy">Premium Economy</option>
+                                                            <option value="Business Class">Business Class</option>
+                                                        </>
+                                                    )}
+                                                    {ticketType === 'bus' && (
+                                                        <>
+                                                            <option value="AC Sleeper Bus">AC Sleeper Bus</option>
+                                                            <option value="Non-AC Sleeper">Non-AC Sleeper</option>
+                                                            <option value="Volvo Multi-Axle AC">Volvo Multi-Axle AC</option>
+                                                        </>
+                                                    )}
+                                                </select>
+                                            </div>
+                                            <div>
+                                                <label class="text-xs font-semibold text-slate-400 block mb-1">Passengers</label>
+                                                <select 
+                                                    value={ticketForm.travelers} 
+                                                    onChange={(e) => setTicketForm({...ticketForm, travelers: e.target.value})} 
+                                                    class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500"
+                                                >
+                                                    <option value="1 Passenger">1 Passenger</option>
+                                                    <option value="2 Passengers">2 Passengers</option>
+                                                    <option value="3-4 Passengers">3-4 Passengers</option>
+                                                    <option value="5+ Group Passengers">5+ Group Passengers</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        {/* Multi-Date Selection (3-4 preferred dates) */}
+                                        <div class="bg-slate-900/60 p-3.5 rounded-xl border border-slate-800">
+                                            <div class="flex items-center justify-between mb-2">
+                                                <span class="text-xs font-bold text-amber-400 flex items-center gap-1.5">
+                                                    <i class="fa-regular fa-calendar-check"></i> Select 3 to 4 Preferred Travel Dates (Flexible options):
+                                                </span>
+                                                <span class="text-[10px] text-slate-400">Helps us find best ticket seats</span>
+                                            </div>
+                                            <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+                                                {[0, 1, 2, 3].map((idx) => (
+                                                    <input 
+                                                        key={idx}
+                                                        type="date" 
+                                                        value={ticketForm.dates[idx]} 
+                                                        onChange={(e) => {
+                                                            const newDates = [...ticketForm.dates];
+                                                            newDates[idx] = e.target.value;
+                                                            setTicketForm({...ticketForm, dates: newDates});
+                                                        }} 
+                                                        class="bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-amber-500"
+                                                        placeholder={`Date ${idx + 1}`}
+                                                    />
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                        <button 
+                                            type="submit" 
+                                            class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl shadow-lg shadow-emerald-900/40 text-sm transition-all flex items-center justify-center gap-2"
+                                        >
+                                            <i class="fa-brands fa-whatsapp text-lg"></i>
+                                            Send Ticket Enquiry to WhatsApp (8521694137)
+                                        </button>
+                                    </form>
+                                </div>
+
+                                {}
+                                <div id="packages-section" class="scroll-mt-20">
+                                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                                        <div>
+                                            <h3 class="text-2xl font-extrabold text-white">Featured Tour Packages & Treks</h3>
+                                            <p class="text-xs text-slate-400">Select categories or state-wise treks below</p>
+                                        </div>
+
+                                        {/* Search Input */}
+                                        <div class="relative w-full md:w-72">
+                                            <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-500 text-xs"></i>
+                                            <input 
+                                                type="text" 
+                                                placeholder="Search destination, trip..." 
+                                                value={searchQuery}
+                                                onChange={(e) => setSearchQuery(e.target.value)}
+                                                class="w-full bg-slate-800 border border-slate-700 rounded-xl pl-9 pr-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500"
+                                            />
+                                            {searchQuery && (
+                                                <button onClick={() => setSearchQuery('')} class="absolute right-3 top-2.5 text-slate-400 text-xs">
+                                                    <i class="fa-solid fa-xmark"></i>
+                                                </button>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    {/* Main Category Chips */}
+                                    <div class="flex items-center gap-2 overflow-x-auto hide-scrollbar pb-3 mb-4">
+                                        {[
+                                            { name: 'All', icon: 'fa-globe' },
+                                            { name: 'Tour Packages', icon: 'fa-map-location-dot' },
+                                            { name: 'International Trips', icon: 'fa-plane' },
+                                            { name: 'Honeymoon Package', icon: 'fa-heart' },
+                                            { name: 'One Day Trip Bangalore', icon: 'fa-city' },
+                                            { name: 'State Trek', icon: 'fa-person-hiking' }
+                                        ].map((cat) => (
+                                            <button 
+                                                key={cat.name}
+                                                onClick={() => { setCategoryFilter(cat.name); setSelectedState('All States'); }}
+                                                class={`px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all border flex items-center gap-1.5 ${categoryFilter === cat.name ? 'bg-blue-600 border-blue-500 text-white shadow-md shadow-blue-900/40' : 'bg-slate-800/80 border-slate-700 text-slate-300 hover:bg-slate-700'}`}
+                                            >
+                                                <i class={`fa-solid ${cat.icon}`}></i>
+                                                {cat.name}
+                                            </button>
+                                        ))}
+                                    </div>
+
+                                    {/* State Wise Trek Filter Sub-bar */}
+                                    <div class="flex items-center gap-2 overflow-x-auto hide-scrollbar pb-4 mb-6 bg-slate-950/40 p-2.5 rounded-2xl border border-slate-800">
+                                        <span class="text-xs font-bold text-amber-400 whitespace-nowrap pl-2">
+                                            <i class="fa-solid fa-filter"></i> State Treks Filter:
+                                        </span>
+                                        {STATES_LIST.map((st) => (
+                                            <button 
+                                                key={st}
+                                                onClick={() => { setSelectedState(st); }}
+                                                class={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${selectedState === st ? 'bg-amber-500 text-slate-950 font-bold shadow' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'}`}
+                                            >
+                                                {st}
+                                            </button>
+                                        ))}
+                                    </div>
+
+                                    {}
+                                    {filteredPackages.length === 0 ? (
+                                        <div class="text-center py-12 glass-card rounded-2xl">
+                                            <i class="fa-solid fa-compass text-4xl text-slate-600 mb-3"></i>
+                                            <h4 class="text-lg font-bold text-slate-300">No trips found matching your filters</h4>
+                                            <p class="text-xs text-slate-500 mb-4">Try clearing filters or search for another destination.</p>
+                                            <button 
+                                                onClick={() => { setCategoryFilter('All'); setSelectedState('All States'); setSearchQuery(''); }}
+                                                class="bg-blue-600 text-white px-4 py-2 rounded-xl text-xs font-semibold"
+                                            >
+                                                Reset Filters
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                            {filteredPackages.map((pkg) => (
+                                                <div key={p.id} class="glass-card rounded-2xl overflow-hidden hover:border-slate-600 transition-all duration-300 flex flex-col group shadow-lg">
+                                                    {/* Card Image */}
+                                                    <div class="relative h-48 overflow-hidden bg-slate-800">
+                                                        <img 
+                                                            src={pkg.image} 
+                                                            alt={pkg.title} 
+                                                            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                                            onError={(e)=>{ e.target.onerror = null; e.target.src="https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=800&q=80"; }}
+                                                        />
+                                                        <div class="absolute top-3 left-3 flex flex-wrap gap-1">
+                                                            <span class="bg-blue-600/90 backdrop-blur-md text-white text-[10px] font-extrabold px-2.5 py-1 rounded-full shadow">
+                                                                {pkg.category}
+                                                            </span>
+                                                            {pkg.state && (
+                                                                <span class="bg-slate-900/90 backdrop-blur-md text-amber-400 text-[10px] font-bold px-2.5 py-1 rounded-full shadow border border-amber-500/30">
+                                                                    📍 {pkg.state}
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                        <div class="absolute bottom-3 right-3 bg-slate-950/80 text-emerald-400 text-xs font-extrabold px-2.5 py-1 rounded-lg backdrop-blur-md border border-emerald-500/30">
+                                                            ⏱️ {pkg.duration}
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Card Details */}
+                                                    <div class="p-5 flex-1 flex flex-col justify-between">
+                                                        <div>
+                                                            <h4 class="font-bold text-lg text-white mb-2 line-clamp-1">{pkg.title}</h4>
+                                                            <p class="text-xs text-slate-400 line-clamp-2 mb-3">{pkg.description}</p>
+                                                            
+                                                            {/* Dates Available */}
+                                                            <div class="mb-4">
+                                                                <span class="text-[11px] font-semibold text-slate-400 block mb-1">Departure Dates:</span>
+                                                                <div class="flex flex-wrap gap-1">
+                                                                    {Array.isArray(pkg.dates) ? pkg.dates.map((d, i) => (
+                                                                        <span key={i} class="bg-slate-800 text-amber-300 text-[10px] px-2 py-0.5 rounded border border-slate-700">
+                                                                            {d}
+                                                                        </span>
+                                                                    )) : (
+                                                                        <span class="bg-slate-800 text-amber-300 text-[10px] px-2 py-0.5 rounded border border-slate-700">
+                                                                            {pkg.dates}
+                                                                        </span>
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        {/* Price & Actions */}
+                                                        <div>
+                                                            <div class="flex items-baseline justify-between border-t border-slate-800 pt-3 mb-3">
+                                                                <div>
+                                                                    <span class="text-xs text-slate-400 block">Per Person</span>
+                                                                    <div class="flex items-baseline gap-2">
+                                                                        <span class="text-2xl font-black text-emerald-400">₹{pkg.price.toLocaleString('en-IN')}</span>
+                                                                        {pkg.originalPrice > pkg.price && (
+                                                                            <span class="text-xs text-slate-500 line-through">₹{pkg.originalPrice.toLocaleString('en-IN')}</span>
+                                                                        )}
+                                                                    </div>
+                                                                </div>
+                                                                <button 
+                                                                    onClick={() => setSelectedPkgDetail(pkg)}
+                                                                    class="text-xs text-blue-400 hover:text-blue-300 underline font-semibold"
+                                                                >
+                                                                    View Details
+                                                                </button>
+                                                            </div>
+
+                                                            <button 
+                                                                onClick={() => setBookingModalPkg(pkg)}
+                                                                class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-xl text-xs transition-all flex items-center justify-center gap-2 shadow-md shadow-blue-900/30"
+                                                            >
+                                                                <i class="fa-solid fa-calendar-plus"></i>
+                                                                Book Now on WhatsApp
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* VIEW 2: FULL TICKET BOOKING PAGE */}
+                        {activeTab === 'tickets' && (
+                            <div class="max-w-3xl mx-auto glass-card p-6 md:p-8 rounded-3xl border border-slate-800 shadow-2xl">
+                                <div class="text-center mb-6">
+                                    <span class="bg-blue-500/20 text-blue-400 text-xs font-bold px-3 py-1 rounded-full border border-blue-500/30">
+                                        Instant Booking Enquiries
+                                    </span>
+                                    <h2 class="text-2xl font-extrabold text-white mt-2">Train, Flight & Bus Ticket Portal</h2>
+                                    <p class="text-xs text-slate-400">Select 3 to 4 preferred departure dates to ensure seat confirmation.</p>
+                                </div>
+
+                                <div class="flex gap-2 bg-slate-900 p-1.5 rounded-2xl mb-6 border border-slate-800">
+                                    <button 
+                                        onClick={() => setTicketType('train')} 
+                                        class={`flex-1 py-2.5 rounded-xl font-bold text-xs transition-all flex items-center justify-center gap-2 ${ticketType === 'train' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:text-slate-200'}`}
+                                    >
+                                        <i class="fa-solid fa-train"></i> Train Ticket
+                                    </button>
+                                    <button 
+                                        onClick={() => setTicketType('flight')} 
+                                        class={`flex-1 py-2.5 rounded-xl font-bold text-xs transition-all flex items-center justify-center gap-2 ${ticketType === 'flight' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:text-slate-200'}`}
+                                    >
+                                        <i class="fa-solid fa-plane-departure"></i> Flight Ticket
+                                    </button>
+                                    <button 
+                                        onClick={() => setTicketType('bus')} 
+                                        class={`flex-1 py-2.5 rounded-xl font-bold text-xs transition-all flex items-center justify-center gap-2 ${ticketType === 'bus' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:text-slate-200'}`}
+                                    >
+                                        <i class="fa-solid fa-bus"></i> Bus Ticket
+                                    </button>
+                                </div>
+
+                                <form onSubmit={handleDirectTicketWhatsApp} class="space-y-4">
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                            <label class="text-xs font-semibold text-slate-300 block mb-1">From Boarding Station / City</label>
+                                            <input 
+                                                type="text" 
+                                                placeholder="e.g. Bangalore (SBC/YPR)" 
+                                                value={ticketForm.fromCity} 
+                                                onChange={(e) => setTicketForm({...ticketForm, fromCity: e.target.value})} 
+                                                class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500"
+                                                required
+                                            />
+                                        </div>
+                                        <div>
+                                            <label class="text-xs font-semibold text-slate-300 block mb-1">To Destination Station / City</label>
+                                            <input 
+                                                type="text" 
+                                                placeholder="e.g. Mumbai / Delhi / Patna" 
+                                                value={ticketForm.toCity} 
+                                                onChange={(e) => setTicketForm({...ticketForm, toCity: e.target.value})} 
+                                                class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500"
+                                                required
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                            <label class="text-xs font-semibold text-slate-300 block mb-1">Travel Class Preference</label>
+                                            <select 
+                                                value={ticketForm.travelClass} 
+                                                onChange={(e) => setTicketForm({...ticketForm, travelClass: e.target.value})} 
+                                                class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500"
+                                            >
+                                                {ticketType === 'train' && (
+                                                    <>
+                                                        <option value="3AC / 2AC / 1AC">3AC / 2AC / 1AC Premium</option>
+                                                        <option value="Sleeper Class (SL)">Sleeper Class (SL)</option>
+                                                        <option value="Tatkal Priority Request">Tatkal Priority Request</option>
+                                                    </>
+                                                )}
+                                                {ticketType === 'flight' && (
+                                                    <>
+                                                        <option value="Economy Class">Economy Class</option>
+                                                        <option value="Premium Economy">Premium Economy</option>
+                                                        <option value="Business Class">Business Class</option>
+                                                    </>
+                                                )}
+                                                {ticketType === 'bus' && (
+                                                    <>
+                                                        <option value="AC Sleeper Bus">AC Sleeper Bus</option>
+                                                        <option value="Non-AC Sleeper">Non-AC Sleeper</option>
+                                                        <option value="Volvo Multi-Axle AC">Volvo Multi-Axle AC</option>
+                                                    </>
+                                                )}
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label class="text-xs font-semibold text-slate-300 block mb-1">Number of Passengers</label>
+                                            <select 
+                                                value={ticketForm.travelers} 
+                                                onChange={(e) => setTicketForm({...ticketForm, travelers: e.target.value})} 
+                                                class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500"
+                                            >
+                                                <option value="1 Adult">1 Adult</option>
+                                                <option value="2 Adults">2 Adults</option>
+                                                <option value="3-4 Travelers">3-4 Travelers</option>
+                                                <option value="5+ Group">5+ Group Booking</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    {/* Multi-Date Selection Section */}
+                                    <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800">
+                                        <div class="mb-3">
+                                            <h4 class="text-sm font-bold text-amber-400 flex items-center gap-2">
+                                                <i class="fa-solid fa-calendar-days"></i> Select 3 to 4 Preferred Travel Dates
+                                            </h4>
+                                            <p class="text-xs text-slate-400">Provide multiple preferred dates so we can book the best available confirm tickets.</p>
+                                        </div>
+
+                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                            {[0, 1, 2, 3].map((idx) => (
+                                                <div key={idx}>
+                                                    <label class="text-[11px] font-semibold text-slate-400 block mb-1">
+                                                        Preferred Date {idx + 1} {idx === 0 ? '(Primary)' : '(Alternative)'}
+                                                    </label>
+                                                    <input 
+                                                        type="date" 
+                                                        value={ticketForm.dates[idx]} 
+                                                        onChange={(e) => {
+                                                            const newDates = [...ticketForm.dates];
+                                                            newDates[idx] = e.target.value;
+                                                            setTicketForm({...ticketForm, dates: newDates});
+                                                        }} 
+                                                        class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500"
+                                                    />
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    <button 
+                                        type="submit" 
+                                        class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold py-3.5 rounded-2xl shadow-xl shadow-emerald-950/50 text-sm transition-all flex items-center justify-center gap-2"
+                                    >
+                                        <i class="fa-brands fa-whatsapp text-xl"></i>
+                                        Send Ticket Request to WhatsApp (8521694137)
+                                    </button>
+                                </form>
+                            </div>
+                        )}
+
+                        {}
+                        {activeTab === 'admin' && isAdminLoggedIn && (
+                            <div class="space-y-6">
+                                <div class="glass-card p-6 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-4 border border-slate-800">
+                                    <div>
+                                        <span class="bg-emerald-500/20 text-emerald-400 text-xs font-bold px-3 py-1 rounded-full border border-emerald-500/30">
+                                            Admin Session Active
+                                        </span>
+                                        <h2 class="text-2xl font-extrabold text-white mt-1">Amit Travels Admin Panel</h2>
+                                        <p class="text-xs text-slate-400">Add, edit, or delete tour packages, treks, and photo links.</p>
+                                    </div>
+                                    <div class="flex items-center gap-3">
+                                        <button 
+                                            onClick={resetDefaultPackages} 
+                                            class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold px-3.5 py-2 rounded-xl border border-slate-700"
+                                        >
+                                            Reset Defaults
+                                        </button>
+                                        <button 
+                                            onClick={() => { setIsAdminLoggedIn(false); setActiveTab('home'); showToast('Logged out from Admin.'); }} 
+                                            class="bg-rose-600/80 hover:bg-rose-600 text-white text-xs font-bold px-3.5 py-2 rounded-xl"
+                                        >
+                                            Logout Admin
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Add / Edit Package Form */}
+                                <div class="glass-card p-6 rounded-2xl border border-slate-800 shadow-xl">
+                                    <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                                        <i class={`fa-solid ${editingPkg ? 'fa-pen-to-square text-amber-400' : 'fa-circle-plus text-blue-400'}`}></i>
+                                        {editingPkg ? `Editing Package: ${editingPkg.title}` : 'Add New Package / State Trek'}
+                                    </h3>
+
+                                    <form onSubmit={handleSavePackage} class="space-y-4">
+                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div>
+                                                <label class="text-xs font-semibold text-slate-300 block mb-1">Package / Trip Title *</label>
+                                                <input 
+                                                    type="text" 
+                                                    placeholder="e.g. Kudremukh Peak Trek" 
+                                                    value={pkgForm.title} 
+                                                    onChange={(e) => setPkgForm({...pkgForm, title: e.target.value})} 
+                                                    class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500"
+                                                    required
+                                                />
+                                            </div>
+                                            <div>
+                                                <label class="text-xs font-semibold text-slate-300 block mb-1">Category *</label>
+                                                <select 
+                                                    value={pkgForm.category} 
+                                                    onChange={(e) => setPkgForm({...pkgForm, category: e.target.value})} 
+                                                    class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500"
+                                                >
+                                                    <option value="Tour Packages">Tour Packages</option>
+                                                    <option value="International Trips">International Trips</option>
+                                                    <option value="Honeymoon Package">Honeymoon Package</option>
+                                                    <option value="One Day Trip Bangalore">One Day Trip Bangalore</option>
+                                                    <option value="State Trek">State Trek</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                            <div>
+                                                <label class="text-xs font-semibold text-slate-300 block mb-1">State / Region Name</label>
+                                                <select 
+                                                    value={pkgForm.state} 
+                                                    onChange={(e) => setPkgForm({...pkgForm, state: e.target.value})} 
+                                                    class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500"
+                                                >
+                                                    <option value="Karnataka">Karnataka</option>
+                                                    <option value="Himachal Pradesh">Himachal Pradesh</option>
+                                                    <option value="Kerala">Kerala</option>
+                                                    <option value="Uttarakhand">Uttarakhand</option>
+                                                    <option value="Goa">Goa</option>
+                                                    <option value="Rajasthan">Rajasthan</option>
+                                                    <option value="Tamil Nadu">Tamil Nadu</option>
+                                                    <option value="International">International</option>
+                                                </select>
+                                            </div>
+                                            <div>
+                                                <label class="text-xs font-semibold text-slate-300 block mb-1">Price (₹) *</label>
+                                                <input 
+                                                    type="number" 
+                                                    placeholder="4999" 
+                                                    value={pkgForm.price} 
+                                                    onChange={(e) => setPkgForm({...pkgForm, price: e.target.value})} 
+                                                    class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500"
+                                                    required
+                                                />
+                                            </div>
+                                            <div>
+                                                <label class="text-xs font-semibold text-slate-300 block mb-1">Original Price (₹) (Discount tag)</label>
+                                                <input 
+                                                    type="number" 
+                                                    placeholder="6999" 
+                                                    value={pkgForm.originalPrice} 
+                                                    onChange={(e) => setPkgForm({...pkgForm, originalPrice: e.target.value})} 
+                                                    class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div>
+                                                <label class="text-xs font-semibold text-slate-300 block mb-1">Tour Photo Direct Image URL Link *</label>
+                                                <input 
+                                                    type="url" 
+                                                    placeholder="https://images.unsplash.com/... or postimg link" 
+                                                    value={pkgForm.image} 
+                                                    onChange={(e) => setPkgForm({...pkgForm, image: e.target.value})} 
+                                                    class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500"
+                                                    required
+                                                />
+                                            </div>
+                                            <div>
+                                                <label class="text-xs font-semibold text-slate-300 block mb-1">Trip Duration</label>
+                                                <input 
+                                                    type="text" 
+                                                    placeholder="e.g. 3 Days / 2 Nights" 
+                                                    value={pkgForm.duration} 
+                                                    onChange={(e) => setPkgForm({...pkgForm, duration: e.target.value})} 
+                                                    class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <label class="text-xs font-semibold text-slate-300 block mb-1">Key Highlights (Comma separated)</label>
+                                            <input 
+                                                type="text" 
+                                                placeholder="e.g. Free Breakfast, Campfire, Trek Guide, Waterfall visit" 
+                                                value={pkgForm.highlights} 
+                                                onChange={(e) => setPkgForm({...pkgForm, highlights: e.target.value})} 
+                                                class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500"
+                                            />
+                                        </div>
+
+                                        <div>
+                                            <label class="text-xs font-semibold text-slate-300 block mb-1">Package Description & Itinerary Details</label>
+                                            <textarea 
+                                                rows="3" 
+                                                placeholder="Detailed description of the tour package..." 
+                                                value={pkgForm.description} 
+                                                onChange={(e) => setPkgForm({...pkgForm, description: e.target.value})} 
+                                                class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500"
+                                            ></textarea>
+                                        </div>
+
+                                        <div class="flex gap-3">
+                                            <button 
+                                                type="submit" 
+                                                class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-5 py-2.5 rounded-xl text-xs shadow-md transition-all flex items-center gap-2"
+                                            >
+                                                <i class="fa-solid fa-cloud-arrow-up"></i>
+                                                {editingPkg ? 'Update Package' : 'Publish Package'}
+                                            </button>
+                                            {editingPkg && (
+                                                <button 
+                                                    type="button" 
+                                                    onClick={() => { setEditingPkg(null); setPkgForm({ title: '', category: 'Tour Packages', state: 'Karnataka', image: '', price: '', originalPrice: '', duration: '', dates: ['', '', ''], highlights: '', description: '' }); }}
+                                                    class="bg-slate-800 text-slate-300 hover:bg-slate-700 font-semibold px-4 py-2.5 rounded-xl text-xs"
+                                                >
+                                                    Cancel Editing
+                                                </button>
+                                            )}
+                                        </div>
+                                    </form>
+                                </div>
+
+                                {/* Manage Existing Packages Table */}
+                                <div class="glass-card p-6 rounded-2xl border border-slate-800 shadow-xl overflow-x-auto">
+                                    <h3 class="text-lg font-bold text-white mb-4">Existing Active Packages ({packages.length})</h3>
+                                    <table class="w-full text-left text-xs text-slate-300">
+                                        <thead class="bg-slate-900 text-slate-400 font-semibold border-b border-slate-800">
+                                            <tr>
+                                                <th class="p-3">Package</th>
+                                                <th class="p-3">Category / State</th>
+                                                <th class="p-3">Price</th>
+                                                <th class="p-3">Duration</th>
+                                                <th class="p-3 text-right">Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="divide-y divide-slate-800">
+                                            {packages.map((pkg) => (
+                                                <tr key={pkg.id} class="hover:bg-slate-800/40">
+                                                    <td class="p-3 flex items-center gap-3">
+                                                        <img src={pkg.image} class="h-10 w-10 rounded-lg object-cover" onError={(e)=>{ e.target.onerror = null; e.target.src="https://placehold.co/100x100/1e293b/ffffff?text=Trip"; }} />
+                                                        <span class="font-bold text-white">{pkg.title}</span>
+                                                    </td>
+                                                    <td class="p-3">
+                                                        <span class="bg-blue-900/60 text-blue-300 px-2 py-0.5 rounded text-[10px] font-semibold mr-1">
+                                                            {pkg.category}
+                                                        </span>
+                                                        <span class="bg-amber-950/60 text-amber-400 px-2 py-0.5 rounded text-[10px]">
+                                                            {pkg.state}
+                                                        </span>
+                                                    </td>
+                                                    <td class="p-3 font-extrabold text-emerald-400">₹{pkg.price}</td>
+                                                    <td class="p-3">{pkg.duration}</td>
+                                                    <td class="p-3 text-right space-x-2">
+                                                        <button 
+                                                            onClick={() => startEditPackage(pkg)} 
+                                                            class="bg-amber-600/80 hover:bg-amber-600 text-white px-2.5 py-1 rounded text-[11px] font-semibold"
+                                                        >
+                                                            Edit
+                                                        </button>
+                                                        <button 
+                                                            onClick={() => handleDeletePackage(pkg.id)} 
+                                                            class="bg-rose-600/80 hover:bg-rose-600 text-white px-2.5 py-1 rounded text-[11px] font-semibold"
+                                                        >
+                                                            Delete
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        )}
+                    </main>
+
+                    {}
+                    
+                    {/* MODAL 1: BOOKING FORM TO WHATSAPP */}
+                    {bookingModalPkg && (
+                        <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+                            <div class="glass-modal max-w-lg w-full rounded-3xl p-6 border border-slate-700 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+                                <button 
+                                    onClick={() => setBookingModalPkg(null)} 
+                                    class="absolute top-4 right-4 text-slate-400 hover:text-white bg-slate-800 p-2 rounded-full text-xs"
+                                >
+                                    <i class="fa-solid fa-xmark text-sm"></i>
+                                </button>
+
+                                <div class="flex items-center gap-3 mb-4">
+                                    <img src={bookingModalPkg.image} class="h-12 w-12 rounded-xl object-cover" />
+                                    <div>
+                                        <span class="text-[10px] bg-blue-500/20 text-blue-400 font-bold px-2 py-0.5 rounded">
+                                            {bookingModalPkg.category}
+                                        </span>
+                                        <h3 class="font-bold text-white text-base leading-tight">{bookingModalPkg.title}</h3>
+                                        <p class="text-xs text-emerald-400 font-extrabold">Price: ₹{bookingModalPkg.price} / person</p>
+                                    </div>
+                                </div>
+
+                                <form onSubmit={handlePackageBookingSubmit} class="space-y-3.5">
+                                    <div>
+                                        <label class="text-xs font-semibold text-slate-300 block mb-1">Your Full Name *</label>
+                                        <input 
+                                            type="text" 
+                                            placeholder="e.g. Amit Kumar" 
+                                            value={bookingCustomer.name} 
+                                            onChange={(e) => setBookingCustomer({...bookingCustomer, name: e.target.value})} 
+                                            class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-blue-500"
+                                            required
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label class="text-xs font-semibold text-slate-300 block mb-1">Mobile / WhatsApp Number *</label>
+                                        <input 
+                                            type="tel" 
+                                            placeholder="e.g. 9876543210" 
+                                            value={bookingCustomer.phone} 
+                                            onChange={(e) => setBookingCustomer({...bookingCustomer, phone: e.target.value})} 
+                                            class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-blue-500"
+                                            required
+                                        />
+                                    </div>
+
+                                    <div class="grid grid-cols-2 gap-3">
+                                        <div>
+                                            <label class="text-xs font-semibold text-slate-300 block mb-1">Number of Travelers</label>
+                                            <select 
+                                                value={bookingCustomer.travelersCount} 
+                                                onChange={(e) => setBookingCustomer({...bookingCustomer, travelersCount: e.target.value})} 
+                                                class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500"
+                                            >
+                                                <option value="1 Person">1 Person</option>
+                                                <option value="2 Adults">2 Adults</option>
+                                                <option value="3-5 Group">3-5 Group</option>
+                                                <option value="6+ Family Group">6+ Family Group</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label class="text-xs font-semibold text-slate-300 block mb-1">Select Available Date</label>
+                                            <select 
+                                                value={bookingCustomer.selectedDate} 
+                                                onChange={(e) => setBookingCustomer({...bookingCustomer, selectedDate: e.target.value})} 
+                                                class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500"
+                                            >
+                                                <option value="">Choose Date...</option>
+                                                {Array.isArray(bookingModalPkg.dates) && bookingModalPkg.dates.map((d, i) => (
+                                                    <option key={i} value={d}>{d}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label class="text-xs font-semibold text-slate-300 block mb-1">Or Specific Travel Dates (If custom)</label>
+                                        <input 
+                                            type="text" 
+                                            placeholder="e.g. Preferred 15th to 18th Oct" 
+                                            value={bookingCustomer.customDates} 
+                                            onChange={(e) => setBookingCustomer({...bookingCustomer, customDates: e.target.value})} 
+                                            class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-blue-500"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label class="text-xs font-semibold text-slate-300 block mb-1">Special Requirements / Notes</label>
+                                        <textarea 
+                                            rows="2" 
+                                            placeholder="Any special requests like meal type, pickup point..." 
+                                            value={bookingCustomer.notes} 
+                                            onChange={(e) => setBookingCustomer({...bookingCustomer, notes: e.target.value})} 
+                                            class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-blue-500"
+                                        ></textarea>
+                                    </div>
+
+                                    <button 
+                                        type="submit" 
+                                        class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold py-3 rounded-2xl shadow-xl shadow-emerald-950/60 text-xs transition-all flex items-center justify-center gap-2"
+                                    >
+                                        <i class="fa-brands fa-whatsapp text-lg"></i>
+                                        Send Booking Details via WhatsApp
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* MODAL 2: PACKAGE DETAILS MODAL */}
+                    {selectedPkgDetail && (
+                        <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+                            <div class="glass-modal max-w-xl w-full rounded-3xl overflow-hidden border border-slate-700 shadow-2xl relative max-h-[90vh] flex flex-col">
+                                <div class="relative h-56 bg-slate-800">
+                                    <img src={selectedPkgDetail.image} class="w-full h-full object-cover" />
+                                    <button 
+                                        onClick={() => setSelectedPkgDetail(null)} 
+                                        class="absolute top-4 right-4 text-slate-300 hover:text-white bg-slate-900/80 p-2 rounded-full text-xs backdrop-blur-md"
+                                    >
+                                        <i class="fa-solid fa-xmark text-sm"></i>
+                                    </button>
+                                    <div class="absolute bottom-3 left-3 flex gap-2">
+                                        <span class="bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full">
+                                            {selectedPkgDetail.category}
+                                        </span>
+                                        <span class="bg-amber-500 text-slate-950 text-xs font-bold px-3 py-1 rounded-full">
+                                            📍 {selectedPkgDetail.state}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="p-6 overflow-y-auto space-y-4">
+                                    <h3 class="text-xl font-extrabold text-white">{selectedPkgDetail.title}</h3>
+                                    <p class="text-xs text-slate-300 leading-relaxed">{selectedPkgDetail.description}</p>
+
+                                    <div>
+                                        <h4 class="text-xs font-bold text-amber-400 mb-2">Trip Highlights & Inclusions:</h4>
+                                        <div class="grid grid-cols-2 gap-2">
+                                            {Array.isArray(selectedPkgDetail.highlights) ? selectedPkgDetail.highlights.map((h, idx) => (
+                                                <div key={idx} class="flex items-center gap-2 text-xs text-slate-300 bg-slate-900/60 p-2 rounded-lg border border-slate-800">
+                                                    <i class="fa-solid fa-circle-check text-emerald-400"></i>
+                                                    <span>{h}</span>
+                                                </div>
+                                            )) : (
+                                                <p class="text-xs text-slate-400">{selectedPkgDetail.highlights}</p>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    <div class="flex items-center justify-between border-t border-slate-800 pt-4">
+                                        <div>
+                                            <span class="text-xs text-slate-400 block">Package Fare</span>
+                                            <span class="text-2xl font-black text-emerald-400">₹{selectedPkgDetail.price}</span>
+                                        </div>
+                                        <button 
+                                            onClick={() => { const p = selectedPkgDetail; setSelectedPkgDetail(null); setBookingModalPkg(p); }}
+                                            class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-5 py-2.5 rounded-xl text-xs transition-all shadow-md shadow-blue-900/40"
+                                        >
+                                            Book This Package
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* MODAL 3: ADMIN AUTH MODAL */}
+                    {isAdminAuthModalOpen && (
+                        <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+                            <div class="glass-modal max-w-sm w-full rounded-3xl p-6 border border-slate-700 shadow-2xl relative">
+                                <button 
+                                    onClick={() => { setIsAdminAuthModalOpen(false); setAdminError(''); }} 
+                                    class="absolute top-4 right-4 text-slate-400 hover:text-white bg-slate-800 p-2 rounded-full text-xs"
+                                >
+                                    <i class="fa-solid fa-xmark text-sm"></i>
+                                </button>
+
+                                <div class="text-center mb-5">
+                                    <div class="h-12 w-12 bg-blue-600/20 text-blue-400 rounded-2xl flex items-center justify-center mx-auto mb-2 border border-blue-500/30">
+                                        <i class="fa-solid fa-lock text-xl"></i>
+                                    </div>
+                                    <h3 class="text-lg font-bold text-white">Admin Authentication</h3>
+                                    <p class="text-xs text-slate-400">Enter security password to access control panel.</p>
+                                </div>
+
+                                <form onSubmit={handleAdminLogin} class="space-y-4">
+                                    <div>
+                                        <input 
+                                            type="password" 
+                                            placeholder="Enter Admin Password..." 
+                                            value={adminPassInput} 
+                                            onChange={(e) => setAdminPassInput(e.target.value)} 
+                                            class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500"
+                                            required
+                                            autoFocus
+                                        />
+                                    </div>
+
+                                    {adminError && (
+                                        <p class="text-xs text-rose-400 font-semibold text-center">{adminError}</p>
+                                    )}
+
+                                    <button 
+                                        type="submit" 
+                                        class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-xl text-xs transition-all shadow-md shadow-blue-900/40"
+                                    >
+                                        Unlock Admin Panel
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    )}
+
+                    {}
+                    <div class="fixed bottom-0 left-0 right-0 z-40 bg-slate-950/95 backdrop-blur-lg border-t border-slate-800 md:hidden px-6 py-2 flex items-center justify-between">
+                        <button 
+                            onClick={() => setActiveTab('home')} 
+                            class={`flex flex-col items-center gap-1 ${activeTab === 'home' ? 'text-blue-400' : 'text-slate-400'}`}
+                        >
+                            <i class="fa-solid fa-compass text-base"></i>
+                            <span class="text-[10px] font-semibold">Trips</span>
+                        </button>
+                        <button 
+                            onClick={() => setActiveTab('tickets')} 
+                            class={`flex flex-col items-center gap-1 ${activeTab === 'tickets' ? 'text-blue-400' : 'text-slate-400'}`}
+                        >
+                            <i class="fa-solid fa-ticket text-base"></i>
+                            <span class="text-[10px] font-semibold">Tickets</span>
+                        </button>
+                        <a 
+                            href={`https://wa.me/${WHATSAPP_NUMBER}`} 
+                            target="_blank" 
+                            rel="noreferrer" 
+                            class="flex flex-col items-center gap-1 text-emerald-400"
+                        >
+                            <i class="fa-brands fa-whatsapp text-lg"></i>
+                            <span class="text-[10px] font-semibold">WhatsApp</span>
+                        </a>
+                        <button 
+                            onClick={() => {
+                                if (isAdminLoggedIn) setActiveTab('admin');
+                                else setIsAdminAuthModalOpen(true);
+                            }} 
+                            class={`flex flex-col items-center gap-1 ${activeTab === 'admin' ? 'text-blue-400' : 'text-slate-400'}`}
+                        >
+                            <i class="fa-solid fa-user-gear text-base"></i>
+                            <span class="text-[10px] font-semibold">Admin</span>
+                        </button>
+                    </div>
+
+                    {}
+                    <footer class="mt-12 border-t border-slate-800 pt-8 pb-12 text-center text-xs text-slate-500">
+                        <div class="max-w-7xl mx-auto px-4 flex flex-col items-center gap-3">
+                            <div class="flex items-center gap-2">
+                                <img src={LOGO_URL} class="h-6 w-6 rounded-md object-cover" />
+                                <span class="font-extrabold text-slate-300">AMIT TRAVELS</span>
+                            </div>
+                            <p>Train, Flight, Bus Tickets & Customized Tour Packages Across India & Abroad.</p>
+                            <p class="text-[11px] text-slate-600">Contact: +91 8521694137 | Bengaluru, Karnataka</p>
+                        </div>
+                    </footer>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
